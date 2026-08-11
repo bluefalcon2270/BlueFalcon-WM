@@ -1,35 +1,29 @@
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import Link from "next/link"
-import AdminSettingsTab from "./tabs/AdminSettingsTab"
-import AdminProductsTab from "./tabs/AdminProductsTab"
-import AdminOrdersTab from "./tabs/AdminOrdersTab"
+import { prisma } from "@/lib/prisma"
+import AdminClient from "./AdminClient"
 
-export default async function AdminDashboard({ searchParams }: { searchParams: { tab?: string } }) {
+export const metadata = { title: "Admin Dashboard" }
+
+export default async function AdminPage() {
   const session = await getServerSession(authOptions)
-  
-  if (!session || (session.user as any).role !== "ADMIN") {
-    redirect("/login")
-  }
+  if (!session?.user) redirect("/login")
 
-  const resolvedParams = await searchParams
-  const activeTab = resolvedParams.tab || "orders"
+  const user = session.user as any
+  if (user.role !== "ADMIN") redirect("/")
 
-  return (
-    <div className="container py-8 animate-fade-in flex flex-col md:flex-row gap-8">
-      <div className="w-full md:w-64 flex flex-col gap-2">
-        <h1 className="text-2xl font-bold mb-4 px-4">Admin Panel</h1>
-        <Link href="/admin?tab=orders" className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === 'orders' ? 'bg-primary text-white' : 'hover:bg-muted'}`}>Orders & Fulfillment</Link>
-        <Link href="/admin?tab=products" className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === 'products' ? 'bg-primary text-white' : 'hover:bg-muted'}`}>Products & Categories</Link>
-        <Link href="/admin?tab=settings" className={`px-4 py-2 rounded font-medium transition-colors ${activeTab === 'settings' ? 'bg-primary text-white' : 'hover:bg-muted'}`}>Site Builder & Settings</Link>
-      </div>
+  const [orders, products, categories, coupons, payments, settings] = await Promise.all([
+    prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { user: true, orderItems: { include: { product: true } } }
+    }),
+    prisma.product.findMany({ include: { images: true, category: true }, orderBy: { name: "asc" } }),
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.coupon.findMany({ orderBy: { code: "asc" } }),
+    prisma.paymentMethod.findMany(),
+    prisma.siteSettings.findUnique({ where: { id: "1" } })
+  ])
 
-      <div className="flex-1">
-        {activeTab === 'orders' && <AdminOrdersTab />}
-        {activeTab === 'products' && <AdminProductsTab />}
-        {activeTab === 'settings' && <AdminSettingsTab />}
-      </div>
-    </div>
-  )
+  return <AdminClient orders={orders} products={products} categories={categories} coupons={coupons} payments={payments} settings={settings} />
 }

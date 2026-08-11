@@ -1,5 +1,4 @@
 "use client"
-
 import { useCart } from "@/context/CartContext"
 import { useSession } from "next-auth/react"
 import { useState, useEffect } from "react"
@@ -10,205 +9,167 @@ export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart()
   const { data: session, status } = useSession()
   const router = useRouter()
-  
+
   const [paymentMethods, setPaymentMethods] = useState<any[]>([])
-  const [selectedMethodId, setSelectedMethodId] = useState<string>("")
+  const [selectedMethodId, setSelectedMethodId] = useState("")
   const [receiptId, setReceiptId] = useState("")
   const [customerNote, setCustomerNote] = useState("")
   const [couponCode, setCouponCode] = useState("")
+  const [couponStatus, setCouponStatus] = useState<{ valid: boolean; message: string; discount?: number } | null>(null)
   const [checkingOut, setCheckingOut] = useState(false)
   const [error, setError] = useState("")
 
   useEffect(() => {
     fetch("/api/payment-methods")
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setPaymentMethods(data)
-          if (data.length > 0) setSelectedMethodId(data[0].id)
-        }
-      })
-      .catch(() => {})
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d) && d.length) { setPaymentMethods(d); setSelectedMethodId(d[0].id) } })
   }, [])
 
-  const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0)
+  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0)
+  const discount = couponStatus?.discount || 0
+  const total    = Math.max(0, subtotal - discount)
   const selectedMethod = paymentMethods.find(m => m.id === selectedMethodId)
 
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return
+    const res = await fetch(`/api/coupons/validate?code=${couponCode}&subtotal=${subtotal}`)
+    const data = await res.json()
+    if (res.ok) {
+      setCouponStatus({ valid: true, message: `Coupon applied! You save $${data.discount.toFixed(2)}`, discount: data.discount })
+    } else {
+      setCouponStatus({ valid: false, message: data.error || "Invalid coupon" })
+    }
+  }
+
   const handleCheckout = async () => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-      return
-    }
-
+    if (status === "unauthenticated") { router.push("/login"); return }
     if (selectedMethod?.requiresReceipt && !receiptId.trim()) {
-      setError("Please enter the Receipt/Tracking ID for your payment.")
-      return
+      setError("Please enter the Receipt / Tracking ID for your payment."); return
     }
+    setCheckingOut(true); setError("")
 
-    setCheckingOut(true)
-    setError("")
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: cart, paymentMethodId: selectedMethodId, receiptId, customerNote, couponCode })
+    })
+    const data = await res.json()
 
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: cart,
-          paymentMethodId: selectedMethodId,
-          receiptId,
-          customerNote,
-          couponCode
-        })
-      })
-
-      const data = await res.json()
-      if (res.ok) {
-        clearCart()
-        router.push("/profile")
-      } else {
-        setError(data.error || "Checkout failed")
-        setCheckingOut(false)
-      }
-    } catch (err) {
-      setError("Something went wrong.")
-      setCheckingOut(false)
-    }
+    if (res.ok) { clearCart(); router.push(`/profile?order=${data.orderId}`) }
+    else { setError(data.error || "Checkout failed"); setCheckingOut(false) }
   }
 
   if (cart.length === 0) {
     return (
-      <div className="container py-24 text-center animate-fade-in">
-        <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
-        <p className="text-muted mb-8">Looks like you haven't added anything yet.</p>
-        <Link href="/shop" className="btn btn-primary">Continue Shopping</Link>
+      <div className="container page-padding">
+        <div className="empty-state" style={{ minHeight: "60vh" }}>
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <h2>Your cart is empty</h2>
+          <p className="text-muted">Add some products and come back here to checkout.</p>
+          <Link href="/shop" className="btn btn-primary btn-lg mt-4">Browse Shop</Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="container py-16 animate-fade-in">
-      <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+    <div className="container page-padding">
+      <h1 className="mb-8">Shopping Cart</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 flex flex-col gap-4">
+      <div className="grid md:grid-2 gap-8" style={{ gridTemplateColumns: "1fr 380px" }}>
+
+        {/* ── Cart Items ── */}
+        <div className="flex flex-col gap-4">
           {cart.map(item => (
-            <div key={item.id} className="card p-4 flex gap-4 items-center">
-              <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-cover rounded bg-muted" />
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{item.name}</h3>
-                <p className="font-medium text-primary">${item.price.toFixed(2)}</p>
+            <div key={item.id} className="card card-body flex items-center gap-4" style={{ borderRadius: "var(--radius-lg)" }}>
+              <div style={{ width: 80, height: 80, flexShrink: 0, borderRadius: "var(--radius)", overflow: "hidden", background: "var(--bg-subtle)" }}>
+                {item.imageUrl && <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="line-clamp-1 mb-1">{item.name}</h4>
+                <p className="text-sm text-muted">${item.price.toFixed(2)} each</p>
               </div>
               <div className="flex items-center gap-4">
-                <select 
-                  className="input py-1 px-2"
-                  value={item.quantity}
-                  onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
-                >
-                  {[1,2,3,4,5,6,7,8,9,10].map(n => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </select>
-                <button 
-                  onClick={() => removeFromCart(item.id)}
-                  className="text-red-500 hover:text-red-700 p-2"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                <div className="qty-stepper">
+                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
+                  <input type="number" value={item.quantity} readOnly />
+                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+                </div>
+                <span style={{ fontWeight: 700, minWidth: "4rem", textAlign: "right" }}>${(item.price * item.quantity).toFixed(2)}</span>
+                <button onClick={() => removeFromCart(item.id)} className="btn btn-ghost" style={{ color: "var(--danger)", padding: "0.4rem" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
             </div>
           ))}
 
-          <div className="card p-4 mt-4">
-            <h4 className="font-bold mb-2">Order Note (Optional)</h4>
-            <textarea 
-              className="input w-full" 
-              placeholder="Any special instructions for us?"
-              value={customerNote}
-              onChange={(e) => setCustomerNote(e.target.value)}
-              rows={3}
-            />
+          {/* Order Note */}
+          <div className="card card-body" style={{ borderRadius: "var(--radius-lg)" }}>
+            <label className="label">Order Note (optional)</label>
+            <textarea className="input" placeholder="Special instructions, delivery notes, etc." value={customerNote} onChange={e => setCustomerNote(e.target.value)} rows={3} />
           </div>
         </div>
 
-        <div className="card p-6 h-fit sticky top-4">
-          <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
-          
-          <div className="flex justify-between mb-4">
-            <span className="text-muted">Subtotal</span>
-            <span className="font-medium">${subtotal.toFixed(2)}</span>
-          </div>
+        {/* ── Order Summary ── */}
+        <div className="flex flex-col gap-4">
+          <div className="card" style={{ borderRadius: "var(--radius-lg)", position: "sticky", top: "calc(var(--nav-height) + 1rem)" }}>
+            <div className="card-header"><h3>Order Summary</h3></div>
+            <div className="card-body flex flex-col gap-4">
 
-          <div className="mb-4 pb-4 border-b" style={{ borderColor: "var(--border)" }}>
-            <label className="text-sm font-bold text-muted block mb-1">Coupon Code</label>
-            <div className="flex gap-2">
-              <input 
-                type="text" 
-                className="input text-sm flex-1" 
-                placeholder="e.g. SUMMER20" 
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-              />
-            </div>
-            <p className="text-xs text-muted mt-1">Discounts will be applied at checkout.</p>
-          </div>
-
-          <div className="mb-6">
-            <label className="text-sm font-bold block mb-2">Payment Method</label>
-            <select 
-              className="input w-full mb-2"
-              value={selectedMethodId}
-              onChange={(e) => setSelectedMethodId(e.target.value)}
-            >
-              {paymentMethods.map(m => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))}
-            </select>
-            
-            {selectedMethod && (
-              <div className="p-3 bg-muted rounded border mt-2" style={{ borderColor: "var(--border)" }}>
-                {selectedMethod.description && (
-                  <p className="font-medium text-sm mb-1">{selectedMethod.description}</p>
-                )}
-                {selectedMethod.instructions && (
-                  <p className="text-xs text-muted mb-3">{selectedMethod.instructions}</p>
-                )}
-                
-                {selectedMethod.requiresReceipt && (
-                  <div>
-                    <label className="text-xs font-bold block mb-1">Receipt / Tracking ID <span className="text-red-500">*</span></label>
-                    <input 
-                      type="text" 
-                      className="input text-sm w-full py-1" 
-                      placeholder="Enter ID here..."
-                      value={receiptId}
-                      onChange={(e) => setReceiptId(e.target.value)}
-                      required
-                    />
-                  </div>
+              {/* Coupon */}
+              <div>
+                <label className="label">Coupon Code</label>
+                <div className="flex gap-2">
+                  <input type="text" className="input" placeholder="e.g. WELCOME20" value={couponCode} onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponStatus(null) }} />
+                  <button onClick={applyCoupon} className="btn btn-secondary" style={{ whiteSpace: "nowrap" }}>Apply</button>
+                </div>
+                {couponStatus && (
+                  <p className="text-sm mt-2" style={{ color: couponStatus.valid ? "var(--success)" : "var(--danger)", fontWeight: 600 }}>
+                    {couponStatus.valid ? "✓ " : "✗ "}{couponStatus.message}
+                  </p>
                 )}
               </div>
-            )}
+
+              {/* Payment Method */}
+              {paymentMethods.length > 0 && (
+                <div>
+                  <label className="label">Payment Method</label>
+                  <select className="select" value={selectedMethodId} onChange={e => setSelectedMethodId(e.target.value)}>
+                    {paymentMethods.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                  </select>
+                  {selectedMethod?.description && (
+                    <div className="alert alert-info mt-3">
+                      <div>
+                        <p style={{ fontWeight: 600, marginBottom: "0.25rem" }}>{selectedMethod.description}</p>
+                        {selectedMethod.instructions && <p className="text-sm" style={{ opacity: 0.85 }}>{selectedMethod.instructions}</p>}
+                      </div>
+                    </div>
+                  )}
+                  {selectedMethod?.requiresReceipt && (
+                    <div className="mt-3">
+                      <label className="label">Receipt / Tracking ID <span style={{ color: "var(--danger)" }}>*</span></label>
+                      <input type="text" className="input" placeholder="Enter your payment reference..." value={receiptId} onChange={e => setReceiptId(e.target.value)} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Price breakdown */}
+              <div className="flex flex-col gap-2 pt-3 border-t">
+                <div className="flex justify-between text-sm"><span className="text-muted">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+                {discount > 0 && <div className="flex justify-between text-sm"><span style={{ color: "var(--success)" }}>Discount</span><span style={{ color: "var(--success)" }}>-${discount.toFixed(2)}</span></div>}
+                <div className="flex justify-between border-t pt-3"><span style={{ fontWeight: 700 }}>Total</span><span style={{ fontSize: "1.2rem", fontWeight: 800 }}>${total.toFixed(2)}</span></div>
+              </div>
+
+              {error && <div className="alert alert-error">{error}</div>}
+
+              <button onClick={handleCheckout} disabled={checkingOut} className="btn btn-primary btn-lg w-full">
+                {checkingOut ? <><span className="spinner" style={{ width: 16, height: 16 }} /> Processing...</> : "Place Order"}
+              </button>
+
+              <p className="text-xs text-muted text-center">🔒 Secure checkout. Your information is protected.</p>
+            </div>
           </div>
-
-          <div className="flex justify-between mb-8 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
-            <span className="font-bold text-lg">Estimated Total</span>
-            <span className="font-bold text-2xl">${subtotal.toFixed(2)}</span>
-          </div>
-
-          {error && <div className="text-red-500 text-sm text-center mb-4 font-medium">{error}</div>}
-
-          <button 
-            className="btn btn-primary w-full py-3" 
-            onClick={handleCheckout}
-            disabled={checkingOut}
-          >
-            {checkingOut ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-                Processing Order...
-              </span>
-            ) : "Place Order"}
-          </button>
         </div>
       </div>
     </div>

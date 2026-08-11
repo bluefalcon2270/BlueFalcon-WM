@@ -2,6 +2,39 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v3.0] - Complete Professional Rebuild
+### Design System
+- **Ground-up CSS rewrite** with a coherent professional design system — Inter font, blue accent (`#3b82f6`), real box shadows, and smooth transitions.
+- **Dark mode by default** — properly persisted in localStorage with zero flash on load.
+- All components (buttons, inputs, cards, badges, tables, spinners, tabs) are now defined consistently.
+
+### Pages
+- **Homepage**: Hero section with stats row, featured products grid, category strip, trust badges. Works even with empty database.
+- **Shop**: Working server-side search + category filtering with pill tabs, proper empty state.
+- **Product Detail**: Image gallery with thumbnails, breadcrumb, stock indicator, discount badge, quantity stepper, related products.
+- **Cart**: Full-featured — quantity steppers, live coupon validation, payment method display with instructions, price breakdown, order notes.
+- **Login**: Beautiful 2-step card flow (identifier → password/register), loading spinners, proper error messages.
+- **Profile**: Sidebar with tabs — Order History (status badges, thumbnails, fulfillment notes) and Account Settings (username/email/password change).
+- **404**: Beautiful typographic 404 page.
+
+### Admin Dashboard
+- **Stats Overview** row at the top (total orders, revenue, products, pending orders).
+- **Orders Tab**: Expandable rows with status update and fulfillment note — fully searchable.
+- **Products Tab**: Full CRUD with image URL support, category assignment, price/discount, stock management.
+- **Coupons Tab**: Create/toggle/delete coupons (percentage or fixed amount).
+- **Payment Methods Tab**: Create/toggle/delete methods with receipt requirement toggle.
+- **Site Settings Tab**: Title, logo, homepage JSON layout editor, footer JSON editor.
+
+### API Routes (New)
+- `GET /api/coupons/validate` — live coupon validation with discount calculation.
+- `PUT /api/profile/update` — secure username/email/password change with bcrypt.
+- `POST/PUT/DELETE /api/admin/products` — full product CRUD.
+- `POST/PUT/DELETE /api/admin/coupons` — full coupon CRUD.
+- `POST/PUT/DELETE /api/admin/payments` — full payment method CRUD.
+- `PUT /api/admin/orders/[id]` — status + fulfillment note update.
+- `PUT /api/admin/settings` — site settings upsert.
+- `POST /api/admin/categories` — category creation.
+
 ## [v2.2] - YouTube Music Aesthetic Redesign
 - **Total Aesthetic Overhaul**: Redesigned the entire CSS framework to perfectly match the sleek, pitch-black aesthetic of YouTube Music / Google Music.
 - **Album-Style Products**: Stripped clunky borders and backgrounds from product cards. Products now render edge-to-edge like beautiful album covers.

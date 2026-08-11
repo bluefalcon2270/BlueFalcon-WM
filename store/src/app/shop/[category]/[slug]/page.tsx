@@ -1,80 +1,142 @@
 import { prisma } from "@/lib/prisma"
 import { notFound } from "next/navigation"
 import AddToCartButton from "./AddToCartButton"
+import ImageGallery from "./ImageGallery"
+import Link from "next/link"
 
-export default async function ProductPage({ params }: { params: { category: string, slug: string } }) {
-  const resolvedParams = await params
-  
+export async function generateMetadata({ params }: { params: { category: string; slug: string } }) {
+  const product = await prisma.product.findUnique({ where: { slug: params.slug } })
+  return { title: product?.name || "Product" }
+}
+
+export default async function ProductPage({ params }: { params: { category: string; slug: string } }) {
   const product = await prisma.product.findUnique({
-    where: { slug: resolvedParams.slug },
+    where: { slug: params.slug },
     include: { images: true, category: true }
   })
 
-  if (!product) {
-    notFound()
-  }
+  if (!product) notFound()
 
-  // Handle case where category doesn't match, unless it's 'all'
-  if (resolvedParams.category !== 'all' && product.category?.slug !== resolvedParams.category) {
-    notFound()
-  }
+  const related = await prisma.product.findMany({
+    where: { categoryId: product.categoryId, id: { not: product.id } },
+    include: { images: true, category: true },
+    take: 4
+  })
 
-  const mainImage = product.images.find(img => img.isMain) || product.images[0]
-  const otherImages = product.images.filter(img => img.id !== mainImage?.id)
+  const mainImage = product.images.find(i => i.isMain) || product.images[0]
+  const displayPrice = product.discountPrice ?? product.price
+  const inStock = product.stock > 0
 
   return (
-    <div className="container py-16 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        
-        {/* Image Gallery */}
-        <div className="flex flex-col gap-4">
-          <div className="card overflow-hidden bg-muted aspect-square flex items-center justify-center">
-             {mainImage ? (
-               <img src={mainImage.url} alt={product.name} className="object-cover w-full h-full" />
-             ) : (
-               <div className="text-muted">No Image</div>
-             )}
-          </div>
-          {otherImages.length > 0 && (
-            <div className="flex gap-4 overflow-x-auto pb-2">
-               {product.images.map(img => (
-                 <div key={img.id} className={`w-20 h-20 rounded border-2 overflow-hidden flex-shrink-0 cursor-pointer ${img.isMain ? 'border-primary' : 'border-transparent'}`}>
-                    <img src={img.url} className="w-full h-full object-cover" />
-                 </div>
-               ))}
-            </div>
+    <div className="container page-padding">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 text-sm text-muted mb-8">
+        <Link href="/" className="hover:text-primary transition">Home</Link>
+        <span>/</span>
+        <Link href="/shop" className="hover:text-primary transition">Shop</Link>
+        {product.category && (
+          <>
+            <span>/</span>
+            <Link href={`/shop/${product.category.slug}`} className="hover:text-primary transition">{product.category.name}</Link>
+          </>
+        )}
+        <span>/</span>
+        <span style={{ color: "var(--text)" }}>{product.name}</span>
+      </nav>
+
+      <div className="grid md:grid-2 gap-12 mb-16">
+        {/* Images */}
+        <ImageGallery images={product.images} productName={product.name} />
+
+        {/* Details */}
+        <div>
+          {product.category && (
+            <Link href={`/shop/${product.category.slug}`} className="badge badge-blue mb-4 inline-block">
+              {product.category.name}
+            </Link>
           )}
-        </div>
+          <h1 className="mb-4" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>{product.name}</h1>
 
-        {/* Product Details */}
-        <div className="flex flex-col gap-6">
-          <div>
-            <div className="text-sm font-bold text-muted uppercase tracking-wider mb-2">
-              {product.category?.name || "Uncategorized"}
-            </div>
-            <h1 className="text-4xl font-bold mb-2">{product.name}</h1>
-            <div className="flex items-center gap-4">
-              {product.discountPrice ? (
-                <>
-                  <span className="text-3xl font-bold text-primary">${product.discountPrice.toFixed(2)}</span>
-                  <span className="text-xl text-muted line-through">${product.price.toFixed(2)}</span>
-                  <span className="bg-primary text-white text-xs font-bold px-2 py-1 rounded">SALE</span>
-                </>
-              ) : (
-                <span className="text-3xl font-bold">${product.price.toFixed(2)}</span>
-              )}
-            </div>
+          {/* Price */}
+          <div className="flex items-center gap-4 mb-6">
+            {product.discountPrice ? (
+              <>
+                <span style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--danger)" }}>
+                  ${product.discountPrice.toFixed(2)}
+                </span>
+                <span style={{ fontSize: "1.1rem", color: "var(--text-faint)", textDecoration: "line-through" }}>
+                  ${product.price.toFixed(2)}
+                </span>
+                <span className="badge badge-red">
+                  {Math.round((1 - product.discountPrice / product.price) * 100)}% OFF
+                </span>
+              </>
+            ) : (
+              <span style={{ fontSize: "1.75rem", fontWeight: 800 }}>${product.price.toFixed(2)}</span>
+            )}
           </div>
 
-          <p className="text-lg leading-relaxed text-muted whitespace-pre-wrap">{product.description}</p>
+          {/* Stock */}
+          <div className="flex items-center gap-2 mb-6">
+            <div style={{
+              width: 8, height: 8, borderRadius: "50%",
+              background: inStock ? "var(--success)" : "var(--danger)"
+            }} />
+            <span className="text-sm font-semibold" style={{ color: inStock ? "var(--success)" : "var(--danger)" }}>
+              {inStock ? `${product.stock} in stock` : "Out of stock"}
+            </span>
+          </div>
 
-          <div className="pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
-             <p className="text-sm font-medium mb-4">Availability: <span className={product.stock > 0 ? "text-green-600" : "text-red-600"}>{product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}</span></p>
-             <AddToCartButton product={{ ...product, price: product.discountPrice || product.price }} />
+          {/* Description */}
+          <p className="text-muted mb-8" style={{ lineHeight: 1.8 }}>{product.description}</p>
+
+          {/* Add to Cart */}
+          <AddToCartButton product={product} disabled={!inStock} />
+
+          {/* Trust signals */}
+          <div className="flex flex-col gap-3 mt-8 pt-8 border-t">
+            {[
+              { icon: "🚀", text: "Fast delivery — ships within 24 hours" },
+              { icon: "🔒", text: "Secure checkout with multiple payment options" },
+              { icon: "↩️", text: "30-day hassle-free returns" },
+            ].map(t => (
+              <div key={t.text} className="flex items-center gap-3 text-sm text-muted">
+                <span>{t.icon}</span> {t.text}
+              </div>
+            ))}
           </div>
         </div>
-
       </div>
+
+      {/* Related Products */}
+      {related.length > 0 && (
+        <div>
+          <h2 className="mb-8">You Might Also Like</h2>
+          <div className="grid grid-2 sm:grid-3 md:grid-4 gap-5">
+            {related.map(p => {
+              const img = p.images.find(i => i.isMain) || p.images[0]
+              return (
+                <Link key={p.id} href={`/shop/${p.category?.slug || "uncategorized"}/${p.slug}`} className="product-card">
+                  <div className="product-card-img">
+                    {img ? <img src={img.url} alt={p.name} /> : <div style={{ width: "100%", height: "100%", background: "var(--bg-subtle)" }} />}
+                    {p.discountPrice && <span className="sale-badge">Sale</span>}
+                  </div>
+                  <div className="product-card-body">
+                    <h3 className="product-card-name line-clamp-2">{p.name}</h3>
+                    <div className="product-card-price">
+                      {p.discountPrice ? (
+                        <><span className="price-original">${p.price.toFixed(2)}</span><span className="price-current price-sale">${p.discountPrice.toFixed(2)}</span></>
+                      ) : (
+                        <span className="price-current">${p.price.toFixed(2)}</span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,55 +1,60 @@
-import Link from "next/link"
+"use client"
 
 export default function Footer({ settings }: { settings: any }) {
-  let footerData = {
-    about: "We provide the best digital and physical goods securely.",
-    phone: "+1 234 567 890",
-    socials: []
-  }
+  const title = settings?.siteTitle || "BlueFalcon"
 
-  if (settings?.footerLayout) {
-    try {
-      footerData = JSON.parse(settings.footerLayout)
-    } catch (e) {}
-  }
+  let footerData: any = {}
+  try { footerData = JSON.parse(settings?.footerLayout || "{}") } catch {}
 
   return (
-    <footer className="border-t py-12 mt-16" style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}>
-      <div className="container grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 className="font-bold text-lg mb-4">{settings?.siteTitle || "Store"}</h3>
-          <p className="text-muted text-sm leading-relaxed max-w-sm">{footerData.about}</p>
-        </div>
-        
-        <div>
-          <h3 className="font-bold text-lg mb-4">Contact Us</h3>
-          <p className="text-sm text-muted mb-2">
-            Phone: <span className="font-medium" style={{ color: "var(--foreground)" }}>{footerData.phone}</span>
-          </p>
-          <div className="mt-4 flex flex-col gap-2">
-            <Link href="/shop" className="text-sm text-primary hover:underline">Browse Products</Link>
+    <footer style={{ background: "var(--bg-elevated)", borderTop: "1px solid var(--border)", marginTop: "auto" }}>
+      <div className="container py-12">
+        <div className="grid md:grid-3 gap-8 mb-10">
+
+          {/* Brand column */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              {settings?.logoUrl && <img src={settings.logoUrl} alt="" style={{ width: 24, height: 24, objectFit: "contain", borderRadius: 4 }} />}
+              <span style={{ fontWeight: 800, fontSize: "1rem", letterSpacing: "-0.03em" }}>{title}</span>
+            </div>
+            <p className="text-sm text-muted" style={{ lineHeight: 1.7, maxWidth: "22rem" }}>
+              {footerData.description || "Your trusted online store for premium products. Fast shipping, easy returns, and 24/7 support."}
+            </p>
+          </div>
+
+          {/* Shop Links */}
+          <div>
+            <h5 className="mb-4" style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>Shop</h5>
+            <div className="flex flex-col gap-3">
+              {[
+                { label: "All Products", href: "/shop" },
+                { label: "New Arrivals", href: "/shop?sort=new" },
+                { label: "Sale Items",   href: "/shop?sort=sale" },
+              ].map(l => (
+                <a key={l.href} href={l.href} className="text-sm nav-link">{l.label}</a>
+              ))}
+            </div>
+          </div>
+
+          {/* Account Links */}
+          <div>
+            <h5 className="mb-4" style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)" }}>Account</h5>
+            <div className="flex flex-col gap-3">
+              {[
+                { label: "Sign In",       href: "/login" },
+                { label: "My Orders",     href: "/profile" },
+                { label: "Account Settings", href: "/profile?tab=settings" },
+              ].map(l => (
+                <a key={l.href} href={l.href} className="text-sm nav-link">{l.label}</a>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div>
-          <h3 className="font-bold text-lg mb-4">Follow Us</h3>
-          <div className="flex flex-col gap-2">
-            {footerData.socials && footerData.socials.length > 0 ? (
-              footerData.socials.map((social: any, idx: number) => (
-                <a key={idx} href={social.link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                  {social.platform}
-                </a>
-              ))
-            ) : (
-              <span className="text-sm text-muted">No social links added yet.</span>
-            )}
-          </div>
+        <div className="border-t pt-6 flex items-center justify-between flex-wrap gap-4">
+          <p className="text-sm text-muted">© {new Date().getFullYear()} {title}. All rights reserved.</p>
+          <p className="text-sm text-muted">Built with BlueFalcon WM</p>
         </div>
-      </div>
-      
-      <div className="container mt-12 pt-8 border-t text-center text-sm text-muted" style={{ borderColor: "var(--border)" }}>
-        &copy; {new Date().getFullYear()} {settings?.siteTitle || "Store"}. All rights reserved.
       </div>
     </footer>
   )
