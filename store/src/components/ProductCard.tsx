@@ -1,35 +1,40 @@
 import Link from "next/link"
 
-type Product = {
-  id: string
-  name: string
-  price: number
-  imageUrl: string
-  category: string
-}
+export default function ProductCard({ product }: { product: any }) {
+  const mainImage = product.images?.find((img: any) => img.isMain) || product.images?.[0]
+  const imageUrl = mainImage?.url || "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
+  const productUrl = product.category ? `/shop/${product.category.slug}/${product.slug}` : `/shop/all/${product.slug}`
 
-export default function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="card flex-col animate-fade-in" style={{ display: "flex" }}>
-      <div style={{ position: "relative", width: "100%", height: "250px" }}>
+    <Link href={productUrl} className="card overflow-hidden group hover:-translate-y-1 transition-transform block">
+      <div className="relative aspect-[3/4] overflow-hidden bg-muted flex items-center justify-center">
         <img 
-          src={product.imageUrl} 
+          src={imageUrl} 
           alt={product.name}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
+        {product.discountPrice && (
+          <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
+            SALE
+          </div>
+        )}
       </div>
-      <div className="flex-col gap-2" style={{ padding: "1.5rem", flex: 1, display: "flex", justifyContent: "space-between" }}>
-        <div>
-          <p className="text-sm text-muted">{product.category}</p>
-          <h3 className="text-lg font-bold" style={{ marginBottom: "0.5rem" }}>{product.name}</h3>
+      <div className="p-4">
+        <div className="text-xs font-bold text-muted uppercase tracking-wider mb-1">
+          {product.category?.name || "Uncategorized"}
         </div>
-        <div className="flex justify-between items-center mt-4">
-          <span className="text-xl font-bold">${product.price.toFixed(2)}</span>
-          <Link href={`/shop/${product.id}`} className="btn btn-primary text-sm">
-            View Details
-          </Link>
+        <h3 className="font-bold text-lg leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-1">{product.name}</h3>
+        <div className="flex items-center gap-2">
+          {product.discountPrice ? (
+            <>
+              <span className="font-bold text-lg">${product.discountPrice.toFixed(2)}</span>
+              <span className="text-sm text-muted line-through">${product.price.toFixed(2)}</span>
+            </>
+          ) : (
+            <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
+          )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

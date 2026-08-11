@@ -4,9 +4,31 @@ const bcrypt = require('bcryptjs')
 const prisma = new PrismaClient()
 
 async function main() {
-  // Create admin user
+  // 1. Site Settings
+  await prisma.siteSettings.upsert({
+    where: { id: "1" },
+    update: {},
+    create: {
+      id: "1",
+      siteTitle: "BlueFalcon Shop",
+      homepageLayout: JSON.stringify([
+        { type: 'hero', title: 'Welcome to BlueFalcon', text: 'Discover our premium digital and physical products.', buttonText: 'Shop Now', buttonLink: '/shop' },
+        { type: 'featured', title: 'Featured Products', buttonText: 'View All', buttonLink: '/shop', productIds: [] }
+      ]),
+      footerLayout: JSON.stringify({
+        about: "We provide the best digital and physical goods securely.",
+        phone: "+1 234 567 890",
+        socials: [
+          { platform: "Twitter", link: "https://twitter.com" },
+          { platform: "Instagram", link: "https://instagram.com" }
+        ]
+      })
+    }
+  })
+
+  // 2. Admin User
   const adminPassword = await bcrypt.hash('admin', 10)
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { username: 'admin' },
     update: {},
     create: {
@@ -16,54 +38,85 @@ async function main() {
     },
   })
 
-  // Create products
-  const products = [
-    {
-      name: "Premium Cotton T-Shirt",
-      description: "Our classic fit t-shirt made from 100% organic cotton. Super soft and breathable.",
-      price: 29.99,
-      imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      category: "T-Shirts"
-    },
-    {
-      name: "Classic Denim Jacket",
-      description: "A timeless denim jacket that goes with any outfit. Durable and stylish.",
-      price: 89.99,
-      imageUrl: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      category: "Outerwear"
-    },
-    {
-      name: "Comfort Fit Jeans",
-      description: "Everyday comfort with a modern cut. Features a slight stretch for mobility.",
-      price: 59.99,
-      imageUrl: "https://images.unsplash.com/photo-1542272604-780c82361ac0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      category: "Pants"
-    },
-    {
-      name: "Minimalist Hoodie",
-      description: "Keep warm in style. This hoodie features a clean design without loud logos.",
-      price: 65.00,
-      imageUrl: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      category: "Hoodies"
+  // 3. Payment Method (Card to Card)
+  await prisma.paymentMethod.create({
+    data: {
+      name: "Card to Card",
+      description: "Transfer to: 1234-5678-9012-3456 (John Doe)",
+      instructions: "Please transfer the exact amount and enter your tracking/receipt ID below.",
+      requiresReceipt: true,
+      isActive: true
     }
-  ]
+  })
 
-  console.log(`Created admin user: ${admin.email}`)
+  // 4. Test Coupon
+  await prisma.coupon.upsert({
+    where: { code: 'WELCOME20' },
+    update: {},
+    create: {
+      code: 'WELCOME20',
+      discountType: 'PERCENTAGE',
+      discountValue: 20
+    }
+  })
 
-  for (const p of products) {
-    const product = await prisma.product.create({
-      data: p
-    })
-    console.log(`Created product: ${product.name}`)
-  }
+  // 5. Categories
+  const catShirts = await prisma.category.upsert({
+    where: { slug: 'shirts' },
+    update: {},
+    create: { name: 'Shirts', slug: 'shirts' }
+  })
+  
+  const catDigital = await prisma.category.upsert({
+    where: { slug: 'digital' },
+    update: {},
+    create: { name: 'Digital Goods', slug: 'digital' }
+  })
+
+  // 6. Products
+  const p1 = await prisma.product.upsert({
+    where: { slug: 'premium-cotton-tshirt' },
+    update: {},
+    create: {
+      name: 'Premium Cotton T-Shirt',
+      slug: 'premium-cotton-tshirt',
+      description: 'A very comfortable cotton t-shirt.',
+      price: 29.99,
+      categoryId: catShirts.id,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80', isMain: true }
+        ]
+      }
+    }
+  })
+
+  const p2 = await prisma.product.upsert({
+    where: { slug: 'digital-software-key' },
+    update: {},
+    create: {
+      name: 'Software License Key (Digital)',
+      slug: 'digital-software-key',
+      description: 'Instant delivery software activation key.',
+      price: 49.99,
+      discountPrice: 39.99,
+      categoryId: catDigital.id,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80', isMain: true }
+        ]
+      }
+    }
+  })
+
+  console.log('v2.0 Database Seeding Complete!')
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
+  .catch((e) => {
     console.error(e)
-    await prisma.$disconnect()
     process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
   })

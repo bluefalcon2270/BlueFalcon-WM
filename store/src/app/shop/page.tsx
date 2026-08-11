@@ -8,18 +8,16 @@ export default async function ShopPage({
 }) {
   const resolvedParams = await searchParams
   const q = resolvedParams.q || ""
-  const category = resolvedParams.category || ""
+  const categorySlug = resolvedParams.category || ""
 
-  // Fetch unique categories for the filter buttons
-  const allProducts = await prisma.product.findMany({ select: { category: true } })
-  const categories = Array.from(new Set(allProducts.map(p => p.category)))
+  const categories = await prisma.category.findMany()
 
-  // Fetch filtered products
   const products = await prisma.product.findMany({
     where: {
       name: { contains: q },
-      ...(category ? { category } : {})
-    }
+      ...(categorySlug ? { category: { slug: categorySlug } } : {})
+    },
+    include: { category: true, images: true }
   })
 
   return (
@@ -28,7 +26,7 @@ export default async function ShopPage({
         <h1 className="text-4xl font-bold">All Products</h1>
         
         <form method="GET" className="flex gap-2 w-full md:w-auto">
-          {category && <input type="hidden" name="category" value={category} />}
+          {categorySlug && <input type="hidden" name="category" value={categorySlug} />}
           <input 
             type="text" 
             name="q" 
@@ -41,12 +39,12 @@ export default async function ShopPage({
       </div>
 
       <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-        <a href={`/shop${q ? `?q=${q}` : ''}`} className={`btn ${!category ? 'btn-primary' : 'btn-outline'}`} style={{ whiteSpace: "nowrap" }}>
-          All
+        <a href={`/shop${q ? `?q=${q}` : ''}`} className={`btn ${!categorySlug ? 'btn-primary' : 'btn-outline'}`} style={{ whiteSpace: "nowrap" }}>
+          All Categories
         </a>
         {categories.map(c => (
-          <a key={c} href={`/shop?category=${c}${q ? `&q=${q}` : ''}`} className={`btn ${category === c ? 'btn-primary' : 'btn-outline'}`} style={{ whiteSpace: "nowrap" }}>
-            {c}
+          <a key={c.id} href={`/shop?category=${c.slug}${q ? `&q=${q}` : ''}`} className={`btn ${categorySlug === c.slug ? 'btn-primary' : 'btn-outline'}`} style={{ whiteSpace: "nowrap" }}>
+            {c.name}
           </a>
         ))}
       </div>
@@ -56,7 +54,7 @@ export default async function ShopPage({
           <p>No products found matching your criteria.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}

@@ -2,6 +2,18 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v2.0] - The CMS Edition (Major Architectural Upgrade)
+- **Dynamic Site Builder**: Added `SiteSettings` to the database. The Homepage (Hero & Featured sections), Footer, Site Title, and Logo are now completely customizable via the Admin Dashboard's new JSON layout editor.
+- **Advanced Navigation**: The Navbar now intelligently hides the "Home" link when on the main page, includes a live-updating shopping cart badge, and features a unified modern User Dropdown menu.
+- **Custom Payment Gateways**: Implemented a dynamic `PaymentMethod` system. Admins can create custom gateways (like "Card to Card") and force users to submit tracking/receipt IDs.
+- **Coupon Code System**: Fully integrated a dynamic coupon engine (percentage or fixed discounts) natively into the checkout flow.
+- **Digital Product Delivery**: Added a "Fulfillment Note" field. Admins can now securely send secret text, license keys, or download links directly into the customer's Order History.
+- **Advanced Product Management**:
+  - **Categories & Slugs**: Products now use clean, SEO-friendly URLs (`/shop/category/product-slug`) instead of database IDs.
+  - **Photo Albums**: Replaced single-image support with multi-image product carousels (select main image vs gallery images).
+  - **Sales & Discounts**: Added support for displaying crossed-out original prices next to dynamic `discountPrice` values.
+- **Admin Layout**: Redesigned the monolithic Admin Dashboard into a scalable, tab-based layout (Orders, Products & Categories, Site Settings).
+
 ## [v1.2] - Installation Bug Fix
 - **Deploy Script**: Fixed an infinite loop bug in `install.sh` that occurred when piping the script directly via curl. The script now correctly grabs keyboard input from the user's terminal (`/dev/tty`).
 

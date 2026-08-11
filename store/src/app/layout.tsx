@@ -1,38 +1,42 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Providers } from "./providers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
+import AuthProvider from "@/components/AuthProvider"
+import { CartProvider } from "@/context/CartContext"
+import { prisma } from "@/lib/prisma"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await prisma.siteSettings.findUnique({ where: { id: "1" } })
+  return {
+    title: settings?.siteTitle || "Premium Store",
+    description: "Your favorite online store",
+  }
+}
 
-export const metadata: Metadata = {
-  title: "Premium Clothing Store",
-  description: "High quality clothing and accessories.",
-};
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const settings = await prisma.siteSettings.findUnique({ where: { id: "1" } })
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <Providers>
-          <Navbar />
-          <main style={{ flex: 1, paddingBottom: "4rem" }}>{children}</main>
-          <Footer />
-        </Providers>
+    <html lang="en">
+      <body className={inter.className}>
+        <AuthProvider>
+          <CartProvider>
+            <Navbar settings={settings} />
+            <main style={{ minHeight: "calc(100vh - 140px)" }}>
+              {children}
+            </main>
+            <Footer settings={settings} />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
-  );
+  )
 }
