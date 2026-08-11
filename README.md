@@ -1,6 +1,6 @@
 # BlueFalcon WM
 
-A blazing-fast, full-stack Next.js 15 E-Commerce template designed for rapid deployment and maximum performance. Built for the modern web, this Premium Clothing Store features a responsive custom design system, smart authentication, and an interactive admin dashboard.
+A blazing-fast, full-stack Next.js 15 E-Commerce template designed for rapid deployment and maximum performance. **BlueFalcon WM (Website Maker)** is built for the modern web, featuring a responsive custom design system, smart authentication, and an interactive CMS admin dashboard.
 
 ## 🚀 Features
 

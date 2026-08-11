@@ -10,7 +10,7 @@ async function main() {
     update: {},
     create: {
       id: "1",
-      siteTitle: "BlueFalcon Shop",
+      siteTitle: "BlueFalcon WM",
       homepageLayout: JSON.stringify([
         { type: 'hero', title: 'Welcome to BlueFalcon', text: 'Discover our premium digital and physical products.', buttonText: 'Shop Now', buttonLink: '/shop' },
         { type: 'featured', title: 'Featured Products', buttonText: 'View All', buttonLink: '/shop', productIds: [] }

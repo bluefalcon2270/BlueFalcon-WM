@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ["latin"] })
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await prisma.siteSettings.findUnique({ where: { id: "1" } })
   return {
-    title: settings?.siteTitle || "Premium Store",
+    title: settings?.siteTitle || "BlueFalcon WM",
     description: "Your favorite online store",
   }
 }
