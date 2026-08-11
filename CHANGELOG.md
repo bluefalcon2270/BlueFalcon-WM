@@ -2,6 +2,12 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v2.2] - YouTube Music Aesthetic Redesign
+- **Total Aesthetic Overhaul**: Redesigned the entire CSS framework to perfectly match the sleek, pitch-black aesthetic of YouTube Music / Google Music.
+- **Album-Style Products**: Stripped clunky borders and backgrounds from product cards. Products now render edge-to-edge like beautiful album covers.
+- **Google Account Dropdown**: Rebuilt the top-right user menu to be a pixel-accurate clone of the sleek Google Account dropdown.
+- **Translucent UI**: The top navigation bar now features a subtle glass-like translucency, and the dark/light mode toggle was stripped down to a clean, minimalist naked icon.
+
 ## [v2.1] - Google Material Theme Upgrade
 - **Theme Overhaul**: Replaced the raw CSS design system with a clean, modern Google Material Design 3 aesthetic.
 - **Dark/Light Mode**: Added a manual Dark/Light mode toggle button to the navigation bar.
