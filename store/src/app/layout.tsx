@@ -4,6 +4,7 @@ import "./globals.css"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import AuthProvider from "@/components/AuthProvider"
+import { ThemeProvider } from "@/components/ThemeProvider"
 import { CartProvider } from "@/context/CartContext"
 import { prisma } from "@/lib/prisma"
 
@@ -25,17 +26,19 @@ export default async function RootLayout({
   const settings = await prisma.siteSettings.findUnique({ where: { id: "1" } })
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <AuthProvider>
-          <CartProvider>
-            <Navbar settings={settings} />
-            <main style={{ minHeight: "calc(100vh - 140px)" }}>
-              {children}
-            </main>
-            <Footer settings={settings} />
-          </CartProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Navbar settings={settings} />
+              <main style={{ minHeight: "calc(100vh - 140px)" }}>
+                {children}
+              </main>
+              <Footer settings={settings} />
+            </CartProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

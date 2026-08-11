@@ -2,6 +2,11 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v2.1] - Google Material Theme Upgrade
+- **Theme Overhaul**: Replaced the raw CSS design system with a clean, modern Google Material Design 3 aesthetic.
+- **Dark/Light Mode**: Added a manual Dark/Light mode toggle button to the navigation bar.
+- **UI Polish**: Fixed navigation bar layout issues, redesigned the Cart notification badge, added soft shadows to product cards, and modernized the user dropdown menu.
+
 ## [v2.0] - The CMS Edition (Major Architectural Upgrade)
 - **Dynamic Site Builder**: Added `SiteSettings` to the database. The Homepage (Hero & Featured sections), Footer, Site Title, and Logo are now completely customizable via the Admin Dashboard's new JSON layout editor.
 - **Advanced Navigation**: The Navbar now intelligently hides the "Home" link when on the main page, includes a live-updating shopping cart badge, and features a unified modern User Dropdown menu.
