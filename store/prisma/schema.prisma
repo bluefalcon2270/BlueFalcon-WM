@@ -8,11 +8,13 @@ generator client {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  email    String  @unique
-  password String
-  role     String  @default("USER") // USER or ADMIN
-  orders   Order[]
+  id            String  @id @default(cuid())
+  username      String? @unique
+  email         String? @unique
+  emailVerified Boolean @default(false)
+  password      String
+  role          String  @default("USER") // USER or ADMIN
+  orders        Order[]
 }
 
 model Product {

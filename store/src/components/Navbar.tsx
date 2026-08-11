@@ -20,7 +20,7 @@ export default function Navbar() {
               {user?.role === "ADMIN" && (
                 <Link href="/admin" className="text-sm font-bold" style={{ color: "var(--primary)" }}>Admin</Link>
               )}
-              <span className="text-sm text-muted hidden md:inline">{user?.email}</span>
+              <Link href="/profile" className="text-sm font-bold hidden md:inline">{user?.name || user?.email || "My Account"}</Link>
               <button onClick={() => signOut()} className="btn btn-outline text-sm">Sign Out</button>
             </div>
           ) : (

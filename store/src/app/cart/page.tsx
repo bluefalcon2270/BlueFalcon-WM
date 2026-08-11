@@ -87,14 +87,29 @@ export default function CartPage() {
             <span className="font-bold">Total</span>
             <span className="font-bold text-xl">${total.toFixed(2)}</span>
           </div>
-          <button 
-            className="btn btn-primary" 
-            style={{ width: "100%" }}
-            onClick={handleCheckout}
-            disabled={checkingOut}
-          >
-            {checkingOut ? "Processing..." : "Proceed to Checkout"}
-          </button>
+          
+          <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--border)" }}>
+            <h4 className="font-bold mb-2 text-sm">Payment Details (Simulated Stripe)</h4>
+            <input type="text" placeholder="Card Number (e.g. 4242 4242 4242 4242)" className="input mb-2 text-sm" />
+            <div className="flex gap-2 mb-4">
+              <input type="text" placeholder="MM/YY" className="input text-sm" />
+              <input type="text" placeholder="CVC" className="input text-sm" />
+            </div>
+            
+            <button 
+              className="btn btn-primary" 
+              style={{ width: "100%" }}
+              onClick={handleCheckout}
+              disabled={checkingOut}
+            >
+              {checkingOut ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="animate-spin" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%' }}></span>
+                  Processing Payment...
+                </span>
+              ) : "Pay Now"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
