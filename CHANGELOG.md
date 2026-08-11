@@ -2,6 +2,9 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v1.2] - Installation Bug Fix
+- **Deploy Script**: Fixed an infinite loop bug in `install.sh` that occurred when piping the script directly via curl. The script now correctly grabs keyboard input from the user's terminal (`/dev/tty`).
+
 ## [v1.1] - Feature Expansion
 - **Smart Authentication**: Unified login/signup flow with username or email auto-detection.
 - **Admin Settings**: Added Profile Settings to the Admin Dashboard (can now update username & password).

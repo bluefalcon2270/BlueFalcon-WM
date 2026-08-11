@@ -18,7 +18,7 @@ if [ -z "$DETECTED_IP" ]; then
 fi
 
 get_server_ip() {
-    read -p "Enter the server IP (Default: ${DETECTED_IP}): " SERVER_IP
+    read -p "Enter the server IP (Default: ${DETECTED_IP}): " SERVER_IP < /dev/tty
     if [ -z "$SERVER_IP" ]; then
         SERVER_IP=$DETECTED_IP
     fi
@@ -115,7 +115,7 @@ while true; do
     echo "3) Update Website (Git Pull & Rebuild)"
     echo "4) View Live Logs"
     echo "5) Exit"
-    read -p "Choice [1-5]: " choice
+    read -p "Choice [1-5]: " choice < /dev/tty
     echo ""
 
     case $choice in
