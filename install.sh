@@ -11,9 +11,10 @@ echo -e "${CYAN}=================================================${NC}"
 echo -e "${CYAN}   BlueFalcon WM - Fast Website Deployment       ${NC}"
 echo -e "${CYAN}=================================================${NC}"
 
-# Detect Public IP
-DETECTED_IP=$(curl -s ifconfig.me)
-if [ -z "$DETECTED_IP" ]; then
+# Detect Public IP safely
+DETECTED_IP=$(curl -s https://api.ipify.org)
+# Check if the result is actually a valid IP format, otherwise default to 127.0.0.1
+if [[ ! "$DETECTED_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     DETECTED_IP="127.0.0.1"
 fi
 
