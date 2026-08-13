@@ -117,12 +117,11 @@ setup_domain() {
         return
     fi
     
-    # Setup Nginx
     echo -e "${YELLOW}Configuring Nginx for $DOMAIN...${NC}"
     cat <<EOF > /etc/nginx/sites-available/default
 server {
     listen 80;
-    server_name $DOMAIN www.$DOMAIN;
+    server_name $DOMAIN;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -141,7 +140,7 @@ EOF
     apt-get install -y -q certbot python3-certbot-nginx
     
     # Run Certbot completely automatically without human interaction
-    certbot --nginx -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --register-unsafely-without-email --redirect
+    certbot --nginx -d $DOMAIN --non-interactive --agree-tos --register-unsafely-without-email --redirect
     
     echo -e "${GREEN}Domain and HTTPS setup complete! Your website is now secure at https://$DOMAIN${NC}"
 }

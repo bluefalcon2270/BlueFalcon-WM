@@ -2,6 +2,11 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v3.4] - SSL NXDOMAIN Fix
+### DevOps & Infrastructure
+- Removed the strict `www.` prefix requirement from the automated Certbot SSL request. This prevents deployment crashes (NXDOMAIN DNS errors) when users bind subdomains (e.g. `test.domain.com`) instead of root domains.
+
+
 ## [v3.3] - Automatic Silent HTTPS/SSL 
 ### DevOps & Infrastructure
 - Removed manual prompts for HTTPS setup in `install.sh`. 
