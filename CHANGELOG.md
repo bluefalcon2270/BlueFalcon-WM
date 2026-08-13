@@ -2,6 +2,13 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v3.1] - VPS Domain & SSL Setup Automation
+### DevOps & Infrastructure
+- Added **Option 5: Setup Custom Domain & SSL** to the interactive `install.sh` script.
+- Automates Nginx reverse proxy configuration for custom domains.
+- Integrated automatic SSL certificate generation and installation via Certbot (Let's Encrypt).
+
+
 ## [v3.0] - Complete Professional Rebuild
 ### Design System
 - **Ground-up CSS rewrite** with a coherent professional design system — Inter font, blue accent (`#3b82f6`), real box shadows, and smooth transitions.

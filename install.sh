@@ -107,6 +107,45 @@ view_logs() {
     pm2 logs store
 }
 
+setup_domain() {
+    echo -e "${YELLOW}Setting up Custom Domain...${NC}"
+    read -p "Enter your domain name (e.g. example.com): " DOMAIN < /dev/tty
+    
+    if [ -z "$DOMAIN" ]; then
+        echo -e "${RED}Domain cannot be empty!${NC}"
+        return
+    fi
+    
+    echo -e "${YELLOW}Configuring Nginx for $DOMAIN...${NC}"
+    cat <<EOF > /etc/nginx/sites-available/default
+server {
+    listen 80;
+    server_name $DOMAIN www.$DOMAIN;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
+}
+EOF
+    systemctl restart nginx
+    
+    echo ""
+    read -p "Do you want to install a free SSL certificate (HTTPS) using Certbot? (y/n): " INSTALL_SSL < /dev/tty
+    if [[ "$INSTALL_SSL" == "y" || "$INSTALL_SSL" == "Y" ]]; then
+        echo -e "${YELLOW}Installing Certbot...${NC}"
+        apt-get install -y certbot python3-certbot-nginx
+        echo -e "${YELLOW}Running Certbot (Follow the prompts)...${NC}"
+        certbot --nginx -d $DOMAIN -d www.$DOMAIN
+    fi
+    
+    echo -e "${GREEN}Domain setup complete! Your website should now be accessible at https://$DOMAIN${NC}"
+}
+
 while true; do
     echo ""
     echo -e "${CYAN}Please select an option:${NC}"
@@ -114,8 +153,9 @@ while true; do
     echo "2) Deploy Website (Fresh Install)"
     echo "3) Update Website (Git Pull & Rebuild)"
     echo "4) View Live Logs"
-    echo "5) Exit"
-    read -p "Choice [1-5]: " choice < /dev/tty
+    echo "5) Setup Custom Domain & SSL"
+    echo "6) Exit"
+    read -p "Choice [1-6]: " choice < /dev/tty
     echo ""
 
     case $choice in
@@ -123,7 +163,8 @@ while true; do
         2) deploy_website ;;
         3) update_website ;;
         4) view_logs ;;
-        5) echo "Exiting..."; exit 0 ;;
+        5) setup_domain ;;
+        6) echo "Exiting..."; exit 0 ;;
         *) echo -e "${RED}Invalid choice!${NC}" ;;
     esac
 done
