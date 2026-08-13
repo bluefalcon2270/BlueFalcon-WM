@@ -2,6 +2,13 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v3.2] - Fully Automated Installer
+### DevOps & Infrastructure
+- Removed the interactive menu from `install.sh` in favor of a true "one-click" automated installation flow.
+- Running `install.sh` by default now installs system dependencies, deploys the website, and optionally configures the custom domain sequentially.
+- Added command-line arguments for secondary tasks: `bash install.sh update`, `bash install.sh logs`, and `bash install.sh domain`.
+
+
 ## [v3.1] - VPS Domain & SSL Setup Automation
 ### DevOps & Infrastructure
 - Added **Option 5: Setup Custom Domain & SSL** to the interactive `install.sh` script.

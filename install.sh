@@ -147,25 +147,35 @@ EOF
     echo -e "${GREEN}Domain setup complete! Your website should now be accessible at https://$DOMAIN${NC}"
 }
 
-while true; do
-    echo ""
-    echo -e "${CYAN}Please select an option:${NC}"
-    echo "1) Install System Dependencies (Node.js, PM2, Nginx)"
-    echo "2) Deploy Website (Fresh Install)"
-    echo "3) Update Website (Git Pull & Rebuild)"
-    echo "4) View Live Logs"
-    echo "5) Setup Custom Domain & SSL"
-    echo "6) Exit"
-    read -p "Choice [1-6]: " choice < /dev/tty
-    echo ""
-
-    case $choice in
-        1) install_dependencies ;;
-        2) deploy_website ;;
-        3) update_website ;;
-        4) view_logs ;;
-        5) setup_domain ;;
-        6) echo "Exiting..."; exit 0 ;;
-        *) echo -e "${RED}Invalid choice!${NC}" ;;
-    esac
-done
+# Command Line Arguments
+case "$1" in
+    update)
+        update_website
+        ;;
+    logs)
+        view_logs
+        ;;
+    domain)
+        setup_domain
+        ;;
+    help)
+        echo -e "${CYAN}Usage:${NC}"
+        echo -e "  bash install.sh         - Full fresh installation (Dependencies -> Deploy -> Domain)"
+        echo -e "  bash install.sh update  - Git Pull & Rebuild website"
+        echo -e "  bash install.sh domain  - Setup Custom Domain & SSL only"
+        echo -e "  bash install.sh logs    - View live PM2 logs"
+        ;;
+    *)
+        # Default behavior: Full Installation
+        echo -e "${CYAN}Starting Full Installation Process...${NC}"
+        install_dependencies
+        deploy_website
+        echo ""
+        read -p "Do you want to setup a Custom Domain & SSL now? (y/n): " SETUP_DOM < /dev/tty
+        if [[ "$SETUP_DOM" == "y" || "$SETUP_DOM" == "Y" ]]; then
+            setup_domain
+        else
+            echo -e "${GREEN}Installation Complete! You can setup a domain later by running: bash install.sh domain${NC}"
+        fi
+        ;;
+esac
