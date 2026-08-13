@@ -2,6 +2,12 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v3.3] - Automatic Silent HTTPS/SSL 
+### DevOps & Infrastructure
+- Removed manual prompts for HTTPS setup in `install.sh`. 
+- The script now silently and automatically runs Certbot, accepts the Let's Encrypt Terms of Service, and forces a secure HTTPS redirect (`--redirect`) without pausing for user input.
+
+
 ## [v3.2] - Fully Automated Installer
 ### DevOps & Infrastructure
 - Removed the interactive menu from `install.sh` in favor of a true "one-click" automated installation flow.

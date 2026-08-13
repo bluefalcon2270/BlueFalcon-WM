@@ -117,6 +117,7 @@ setup_domain() {
         return
     fi
     
+    # Setup Nginx
     echo -e "${YELLOW}Configuring Nginx for $DOMAIN...${NC}"
     cat <<EOF > /etc/nginx/sites-available/default
 server {
@@ -135,16 +136,14 @@ server {
 EOF
     systemctl restart nginx
     
-    echo ""
-    read -p "Do you want to install a free SSL certificate (HTTPS) using Certbot? (y/n): " INSTALL_SSL < /dev/tty
-    if [[ "$INSTALL_SSL" == "y" || "$INSTALL_SSL" == "Y" ]]; then
-        echo -e "${YELLOW}Installing Certbot...${NC}"
-        apt-get install -y certbot python3-certbot-nginx
-        echo -e "${YELLOW}Running Certbot (Follow the prompts)...${NC}"
-        certbot --nginx -d $DOMAIN -d www.$DOMAIN
-    fi
+    # Automatically install and configure HTTPS/SSL
+    echo -e "${YELLOW}Securing website with Free SSL (HTTPS)...${NC}"
+    apt-get install -y -q certbot python3-certbot-nginx
     
-    echo -e "${GREEN}Domain setup complete! Your website should now be accessible at https://$DOMAIN${NC}"
+    # Run Certbot completely automatically without human interaction
+    certbot --nginx -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --register-unsafely-without-email --redirect
+    
+    echo -e "${GREEN}Domain and HTTPS setup complete! Your website is now secure at https://$DOMAIN${NC}"
 }
 
 # Command Line Arguments
@@ -171,11 +170,7 @@ case "$1" in
         install_dependencies
         deploy_website
         echo ""
-        read -p "Do you want to setup a Custom Domain & SSL now? (y/n): " SETUP_DOM < /dev/tty
-        if [[ "$SETUP_DOM" == "y" || "$SETUP_DOM" == "Y" ]]; then
-            setup_domain
-        else
-            echo -e "${GREEN}Installation Complete! You can setup a domain later by running: bash install.sh domain${NC}"
-        fi
+        setup_domain
+        echo -e "${GREEN}Full Installation Complete!${NC}"
         ;;
 esac
