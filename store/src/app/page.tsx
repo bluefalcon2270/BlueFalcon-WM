@@ -70,7 +70,7 @@ export default async function HomePage() {
                     {section.buttonText || "Browse Shop"}
                   </Link>
                   {categories[0] && (
-                    <Link href={`/shop/${categories[0].slug}`} className="btn btn-secondary btn-xl">
+                    <Link href={`/shop?cat=${categories[0].slug}`} className="btn btn-secondary btn-xl">
                       {categories[0].name}
                     </Link>
                   )}
@@ -125,6 +125,37 @@ export default async function HomePage() {
           )
         }
 
+        // ── Promotional Banner ──────────────────────────────────────────
+        if (section.type === "banner") {
+          return (
+            <section key={i} className="container py-12">
+              <div style={{
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "var(--radius-xl)",
+                minHeight: "300px",
+                display: "flex",
+                alignItems: "center",
+                padding: "3rem",
+                color: "#fff",
+                background: section.bgImage 
+                  ? `linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%), url(${section.bgImage})`
+                  : "linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)",
+                backgroundSize: "cover",
+                backgroundPosition: "center"
+              }}>
+                <div style={{ position: "relative", zIndex: 1, maxWidth: "500px" }}>
+                  <h2 style={{ color: "#fff", fontSize: "2.5rem", marginBottom: "1rem" }}>{section.title}</h2>
+                  <p style={{ fontSize: "1.1rem", opacity: 0.9, marginBottom: "2rem" }}>{section.text}</p>
+                  <Link href={section.buttonLink || "/shop"} className="btn btn-primary" style={{ background: "#fff", color: "#000" }}>
+                    {section.buttonText || "Shop Now"}
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )
+        }
+
         return null
       })}
 
@@ -135,7 +166,7 @@ export default async function HomePage() {
             <h2 className="mb-8">Shop by Category</h2>
             <div className="grid grid-2 sm:grid-3 md:grid-4 gap-4">
               {categories.map(cat => (
-                <Link key={cat.id} href={`/shop/${cat.slug}`} className="card card-hoverable" style={{
+                <Link key={cat.id} href={`/shop?cat=${cat.slug}`} className="card card-hoverable" style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

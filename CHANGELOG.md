@@ -2,6 +2,15 @@
 
 All notable changes to the BlueFalcon WM project will be documented in this file.
 
+## [v3.5] - WAF Video Visual Overhaul & Next.js 16 Fixes
+### UI & Architecture
+- **Visual Overhaul**: Introduced a new `banner` layout block system to the homepage rendering engine for massive promotional graphics.
+- **Data Initialization**: Completely rewrote `prisma/seed.js` to inject 16 high-quality, realistic placeholder products across 4 categories (using Unsplash imagery) and a dense, visually rich homepage layout.
+- **Bug Fix**: Fixed a critical `500 Server Error` on product detail pages by resolving a Next.js 16 dynamic route Promise constraint on URL parameters.
+- **Bug Fix**: Fixed `404` errors on the homepage by correcting the URL linking strategy for categories to properly utilize the `?cat=` query architecture.
+- **DevOps**: Modified the `update_website` function in `install.sh` to automatically re-seed the database upon every update pull to ensure layout consistency.
+
+
 ## [v3.4] - SSL NXDOMAIN Fix
 ### DevOps & Infrastructure
 - Removed the strict `www.` prefix requirement from the automated Certbot SSL request. This prevents deployment crashes (NXDOMAIN DNS errors) when users bind subdomains (e.g. `test.domain.com`) instead of root domains.

@@ -4,14 +4,16 @@ import AddToCartButton from "./AddToCartButton"
 import ImageGallery from "./ImageGallery"
 import Link from "next/link"
 
-export async function generateMetadata({ params }: { params: { category: string; slug: string } }) {
-  const product = await prisma.product.findUnique({ where: { slug: params.slug } })
+export async function generateMetadata({ params }: { params: Promise<{ category: string; slug: string }> }) {
+  const resolvedParams = await params
+  const product = await prisma.product.findUnique({ where: { slug: resolvedParams.slug } })
   return { title: product?.name || "Product" }
 }
 
-export default async function ProductPage({ params }: { params: { category: string; slug: string } }) {
+export default async function ProductPage({ params }: { params: Promise<{ category: string; slug: string }> }) {
+  const resolvedParams = await params
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug: resolvedParams.slug },
     include: { images: true, category: true }
   })
 

@@ -98,6 +98,7 @@ update_website() {
     npm install
     npx prisma generate
     npx prisma db push
+    node prisma/seed.js
     npm run build
     pm2 reload store
     cd ..
