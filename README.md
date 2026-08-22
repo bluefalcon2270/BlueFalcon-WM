@@ -5,7 +5,7 @@
 **A blazing-fast, full-stack Next.js E-Commerce template designed for rapid deployment and maximum performance.**
 
 ![Platform](https://img.shields.io/badge/Platform-Web-FCC624?style=for-the-badge&logo=next.js&logoColor=black)
-[![Version](https://img.shields.io/badge/Version-v3.7-007AFF?style=for-the-badge)](#)
+[![Version](https://img.shields.io/badge/Version-v3.8-007AFF?style=for-the-badge)](#)
 [![Language](https://img.shields.io/badge/Written%20in-Next.js-3776AB?style=for-the-badge&logo=react&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
@@ -24,9 +24,15 @@ Built for the modern web, this template features a responsive custom design syst
 <br>
 
 ## 🚀 How to Use
-1. **Clone:** Clone this repository to your local machine.
-2. **Install:** Run the setup script provided in the repository to install dependencies and initialize the database.
-3. **Enjoy:** Start the development server and access your beautifully designed e-commerce storefront.
+1. **Connect:** SSH into your Linux VPS (Debian/Ubuntu).
+
+2. **Run the Initializer:** Paste the following command to automatically download and launch the installer:
+   
+   ```bash
+   bash <(curl -Ls https://raw.githubusercontent.com/bluefalcon2270/bluefalcon-website-maker/main/init.sh)
+   ```
+
+3. **Enjoy:** Follow the interactive prompts to deploy your Next.js E-Commerce storefront.
 
 <br>
 

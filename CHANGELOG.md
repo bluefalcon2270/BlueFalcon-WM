@@ -2,6 +2,10 @@
 
 All notable changes to the BlueFalcon Website Maker project will be documented in this file.
 
+## [v3.8] - 2026-08-23
+### Added
+- Added the `init.sh` quick-run `curl` command directly into the README.md so users can seamlessly deploy the website from a single command.
+
 ## [v3.7] - 2026-08-23
 ### Fixed
 - Replaced all legacy instances of `BlueFalcon-WM` (and `BlueFalcon WM`) across the `init.sh`, `install.sh`, and Next.js frontend code (such as the default footer, layout titles, and Prisma schema defaults) to fully align with the standard `BlueFalcon Website Maker` name.
