@@ -2,7 +2,7 @@
 import { useState } from "react"
 
 export default function SettingsTab({ settings }: { settings: any }) {
-  const [title, setTitle] = useState(settings?.siteTitle || "BlueFalcon WM")
+  const [title, setTitle] = useState(settings?.siteTitle || "BlueFalcon Website Maker")
   const [logo, setLogo]   = useState(settings?.logoUrl || "")
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
@@ -42,7 +42,7 @@ export default function SettingsTab({ settings }: { settings: any }) {
       <div className="card-body flex flex-col gap-5">
         <div className="form-group">
           <label className="label">Site Title</label>
-          <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="BlueFalcon WM" />
+          <input className="input" value={title} onChange={e => setTitle(e.target.value)} placeholder="BlueFalcon Website Maker" />
         </div>
         <div className="form-group">
           <label className="label">Logo URL</label>

@@ -8,7 +8,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}=================================================${NC}"
-echo -e "${CYAN}   BlueFalcon WM - Fast Website Deployment       ${NC}"
+echo -e "${CYAN}   BlueFalcon Website Maker - Fast Website Deployment       ${NC}"
 echo -e "${CYAN}=================================================${NC}"
 
 # Detect Public IP safely

@@ -10,7 +10,7 @@ import { prisma } from "@/lib/prisma"
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await prisma.siteSettings.findUnique({ where: { id: "1" } })
   return {
-    title: { template: `%s | ${settings?.siteTitle || "BlueFalcon"}`, default: settings?.siteTitle || "BlueFalcon WM" },
+    title: { template: `%s | ${settings?.siteTitle || "BlueFalcon"}`, default: settings?.siteTitle || "BlueFalcon Website Maker" },
     description: "Premium products, fast shipping, easy returns.",
   }
 }

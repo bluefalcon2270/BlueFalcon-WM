@@ -2,6 +2,10 @@
 
 All notable changes to the BlueFalcon Website Maker project will be documented in this file.
 
+## [v3.7] - 2026-08-23
+### Fixed
+- Replaced all legacy instances of `BlueFalcon-WM` (and `BlueFalcon WM`) across the `init.sh`, `install.sh`, and Next.js frontend code (such as the default footer, layout titles, and Prisma schema defaults) to fully align with the standard `BlueFalcon Website Maker` name.
+
 ## [v3.6] - 2026-08-23
 ### Changed
 - Standardized project name, README, and common files structure.

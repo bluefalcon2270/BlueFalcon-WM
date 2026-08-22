@@ -53,7 +53,7 @@ export default function Footer({ settings }: { settings: any }) {
 
         <div className="border-t pt-6 flex items-center justify-between flex-wrap gap-4">
           <p className="text-sm text-muted">© {new Date().getFullYear()} {title}. All rights reserved.</p>
-          <p className="text-sm text-muted">Built with BlueFalcon WM</p>
+          <p className="text-sm text-muted">Built with BlueFalcon Website Maker</p>
         </div>
       </div>
     </footer>

@@ -9,7 +9,7 @@ generator client {
 
 model SiteSettings {
   id               String  @id @default("1")
-  siteTitle        String  @default("BlueFalcon WM")
+  siteTitle        String  @default("BlueFalcon Website Maker")
   logoUrl          String?
   homepageLayout   String  @default("[]") 
   footerLayout     String  @default("{}")
