@@ -1,6 +1,10 @@
 # Changelog
 
-All notable changes to the BlueFalcon WM project will be documented in this file.
+All notable changes to the BlueFalcon Website Maker project will be documented in this file.
+
+## [v3.6] - 2026-08-23
+### Changed
+- Standardized project name, README, and common files structure.
 
 ## [v3.5] - WAF Video Visual Overhaul & Next.js 16 Fixes
 ### UI & Architecture

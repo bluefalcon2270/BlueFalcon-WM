@@ -1,69 +1,65 @@
-# BlueFalcon WM
+<div align="center">
 
-A blazing-fast, full-stack Next.js 15 E-Commerce template designed for rapid deployment and maximum performance. **BlueFalcon WM (Website Maker)** is built for the modern web, featuring a responsive custom design system, smart authentication, and an interactive CMS admin dashboard.
+# 🦅 BlueFalcon Website Maker
 
-## 🚀 Features
+**A blazing-fast, full-stack Next.js E-Commerce template designed for rapid deployment and maximum performance.**
 
-### v1.1 Updates
-- **Unified Smart Authentication**: Seamless login/signup flow with auto-detection for usernames or emails.
-- **Admin Settings Panel**: Easily change your admin username and password directly from the live dashboard.
-- **User Profiles**: Customers can view their account details, email verification status, and complete order history.
-- **Advanced Shop Filtering**: Includes a search bar and category filters to instantly find products.
-- **Direct Image Uploads**: Admins can upload product images directly from their local computer.
-- **Revenue Analytics**: Interactive Recharts bar graph displaying store revenue over time.
-- **Simulated Stripe Checkout**: A professional credit card checkout simulation ready to be swapped with real Stripe API keys.
+![Platform](https://img.shields.io/badge/Platform-Web-FCC624?style=for-the-badge&logo=next.js&logoColor=black)
+[![Version](https://img.shields.io/badge/Version-v3.6-007AFF?style=for-the-badge)](#)
+[![Language](https://img.shields.io/badge/Written%20in-Next.js-3776AB?style=for-the-badge&logo=react&logoColor=white)](#)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-### Core Architecture
-- **Framework**: Next.js 15 (App Router, Server Actions)
-- **Database**: Prisma ORM with local SQLite (`dev.db`)
-- **Authentication**: NextAuth.js (Credentials Provider)
-- **Styling**: Custom Vanilla CSS Design System (Dark/Light mode support, micro-animations, glassmorphism)
+</div>
+
+<br>
+
+## 📖 About
+Built for the modern web, this template features a responsive custom design system, smart authentication, and an interactive CMS admin dashboard. It includes everything you need to launch a beautiful, high-performance online store instantly.
+
+<br>
+
+## 📸 Screenshot
+![Screenshot](screenshot.png)
+
+<br>
+
+## 🚀 How to Use
+1. **Clone:** Clone this repository to your local machine.
+2. **Install:** Run the setup script provided in the repository to install dependencies and initialize the database.
+3. **Enjoy:** Start the development server and access your beautifully designed e-commerce storefront.
+
+<br>
+
+## ✨ Features
+- **Next.js App Router:** Built entirely on the latest Next.js architecture for blazing fast server-side rendering.
+- **Admin Dashboard:** A fully interactive CMS to manage products, categories, orders, and view revenue analytics.
+- **Smart Authentication:** Seamless login/signup flow with auto-detection for usernames or emails, plus user profile management.
+
+<br>
+
+## 💻 Supported Systems
+| Operating System | Compatibility |
+| :--- | :---: |
+| **Windows / macOS / Linux** | ✅ |
+| **Node.js Environment** | ✅ |
+
+<br>
+
+## 📺 Video Tutorial
+*(A video tutorial is coming soon! Check back later for a link to the YouTube walkthrough.)*
+
+[![YouTube](https://img.shields.io/badge/YouTube-Subscribe-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@BlueFalcon2270)
+
+<br>
+
+## ☕ Support & Donate
+If you find this tool helpful and want to support its continued development, consider buying me a coffee or donating via crypto!
+
+- **Gram on ton:** `UQAQ1fZyX_EAcz0Q5z7sEfQxE0SCrVfycq5spWz0OQIOtrJl`
+- **Solana:** `CRrd7ABM8ZMLNDPvo6Jkq354FpqoUFcNmuN74ztCUcM1`
+- **Ethereum:** `0x1ec913bb2a65968945103da1734e987a9d1926d8`
 
 ---
-
-## ⚡ Deployment (One-Click Install)
-
-You can deploy this entire website onto a fresh Ubuntu/Debian VPS in seconds using our magic initializer script. 
-
-Simply log into your VPS via SSH and paste this single command:
-
-```bash
-curl -sL https://raw.githubusercontent.com/bluefalcon2270/BlueFalcon-WM/main/init.sh | bash
-```
-
-### What does the initializer do?
-1. Automatically updates the system and installs `git`.
-2. Downloads the latest version of the repository.
-3. Launches the **Interactive Bash Menu** (`install.sh`).
-
-### The Interactive Menu
-Once the menu opens, you can easily manage your server:
-1. **Install System Dependencies**: Installs Node.js, PM2, and Nginx. (Run this first on a fresh VPS!)
-2. **Deploy Website**: Builds the Next.js app, syncs the database, auto-detects your server IP, and starts the web server.
-3. **Update Website**: Pulls the latest commits from GitHub and cleanly rebuilds the live application.
-4. **View Live Logs**: Tails the PM2 logs so you can monitor live traffic and errors.
-
----
-
-## 💻 Local Development
-
-If you want to run the project locally on your PC:
-
-1. **Install Dependencies**
-   ```bash
-   cd store
-   npm install
-   ```
-2. **Initialize Database**
-   ```bash
-   npx prisma db push
-   node prisma/seed.js
-   ```
-3. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
-
-**Default Admin Credentials:**
-- Username: `admin`
-- Password: `admin`
+<div align="center">
+<i>Created by BlueFalcon</i>
+</div>
